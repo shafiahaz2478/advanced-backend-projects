@@ -52,9 +52,9 @@ The application must provide APIs for the following. Fill in the API contract fo
 | 3 | Partially update package details | PATCH | /packages| /{package_id} | | | |
 | 4 | Delete a package (only if it has not been dispatched) | DELETE| /packages| /{package_id}| | | |
 | 5 | Search and filter packages (by destination, status, arrival date) | GET | /packages | | | | |
-| 6 | View dispatch batches (filter by destination, vehicle, dispatch status) | | | | | | |
+| 6 | View dispatch batches (filter by destination, vehicle, dispatch status) | GET | /dispatch| | | | |
 | 7 | Get warehouse statistics (dispatch summary) | | | | | | |
-| 8 | Add data manually (e.g. create a dispatch batch and assign packages) | | | | | | |
+| 8 | Add data manually (e.g. create a dispatch batch and assign packages) | POST| /dispatch| | | | |
 
 > **Your task:** Complete the table before you start building. For each API, decide the HTTP method, endpoint path, path and query parameters, request body, response body, and status codes — including error cases (e.g. package not found, deleting a dispatched package).
 

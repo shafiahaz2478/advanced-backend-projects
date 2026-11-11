@@ -45,3 +45,14 @@ def get_package(package_id):
 @app.get("/packages")
 def get_packages(destination=None,arrival_date=None,status=None):
     return functions.get_packages(destination, arrival_date, status)["packages"]
+
+@app.get("/dispatch")
+def get_dispatches(destination=None,vehicle=None,status=None):
+    return functions.get_dispatch(destination, vehicle, status)["dispatches"]
+
+@app.post("/dispatch")
+def add_dispatch(packageId, destination,vehicle,status="transporting"):
+    response = functions.add_dispatch(packageId, destination, vehicle, status)
+    if response["code"] == 200:
+        return response["dispatch"]
+    raise HTTPException(status_code=response["code"], detail=response["msg"])
