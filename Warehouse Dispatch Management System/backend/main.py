@@ -26,3 +26,10 @@ def get_package(package_id):
         return response["package"]
     raise HTTPException(status_code=response["code"] , detail=response["msg"])
 
+@app.patch("/packages/{package_id}")
+def update_package(package_id , name=None,destination=None,weight=None,arrival_date=None,status=None):
+    response = functions.update_package(package_id,name, destination, weight, arrival_date, status)
+    if response["code"] == 200:
+        return response["package"]
+    raise HTTPException(status_code=response["code"], detail=response["msg"])
+

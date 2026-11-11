@@ -46,3 +46,23 @@ def package_to_dict(package:Package):
         "status": package.status
 
     }
+
+def update_package(id, name=None,destination=None,weight=None,arrival_date=None,status=None):
+    session = Session(engine)
+    package = session.get(Package, id)
+    if not package:
+        return {"code": 404, "msg": "Package Not Found"}
+
+    package.name = name if name else package.name
+    package.destination = destination if destination else package.destination
+    package.weight = weight if weight else package.weight
+    package.arrival_date = arrival_date if arrival_date else package.arrival_date
+    package.status = status if status else package.status
+
+    session.commit()
+    response = package_to_dict(package)
+    session.close()
+    return {"code": 200, "package": response}
+
+
+
