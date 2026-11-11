@@ -64,5 +64,42 @@ def update_package(id, name=None,destination=None,weight=None,arrival_date=None,
     session.close()
     return {"code": 200, "package": response}
 
+def del_package(id):
+    session = Session(engine)
+    package = session.get(Package, id)
+    if not package:
+        return {"code": 404, "msg": "Package Not Found"}
+    if package.status == "dispatched":
+        return {"code": 403, "msg": "Package already dispatched"}
+
+    session.delete(package)
+    session.commit()
+    session.close()
+    return {"code": 200, "msg": "Package deleted"}
+
+def get_packages(destination=None,arrival_date=None,status=None):
+    session = Session(engine)
+    packages = session.query(Package)
+    if destination:
+        packages = packages.filter(Package.destination == destination)
+
+    if arrival_date:
+        packages = packages.filter(Package.arrival_date == arrival_date)
+
+    if status:
+        packages = packages.filter(Package.status == status)
+
+    packages = packages.all()
+
+    response = []
+
+    for package in packages:
+        response.append(package_to_dict(package))
+
+    session.close()
+    return {"code":200 , "packages": response}
+
+
+
 
 

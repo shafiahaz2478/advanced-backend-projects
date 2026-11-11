@@ -48,10 +48,10 @@ The application must provide APIs for the following. Fill in the API contract fo
 | # | Description | Method | Endpoint | Path / Query Params | Request Body | Response Body | Status Codes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Register a package | GET | /register| | | | |
-| 2 | Get the details of a specific package | GET | /package| /{package_id} | | | |
-| 3 | Partially update package details | | | | | | |
-| 4 | Delete a package (only if it has not been dispatched) | | | | | | |
-| 5 | Search and filter packages (by destination, status, arrival date) | | | | | | |
+| 2 | Get the details of a specific package | GET | /packages| /{package_id} | | | |
+| 3 | Partially update package details | PATCH | /packages| /{package_id} | | | |
+| 4 | Delete a package (only if it has not been dispatched) | DELETE| /packages| /{package_id}| | | |
+| 5 | Search and filter packages (by destination, status, arrival date) | GET | /packages | | | | |
 | 6 | View dispatch batches (filter by destination, vehicle, dispatch status) | | | | | | |
 | 7 | Get warehouse statistics (dispatch summary) | | | | | | |
 | 8 | Add data manually (e.g. create a dispatch batch and assign packages) | | | | | | |

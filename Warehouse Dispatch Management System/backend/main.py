@@ -16,7 +16,7 @@ app.add_middleware(CORSMiddleware,
 
 @app.get("/register")
 def register(name : str, destination : str, weight : float, arrival_date: date):
-    return functions.register_package(name, destination, weight, arrival_date)
+    return functions.register_package(name, destination, weight, arrival_date)["package"]
 
 
 @app.get("/packages/{package_id}")
@@ -33,3 +33,15 @@ def update_package(package_id , name=None,destination=None,weight=None,arrival_d
         return response["package"]
     raise HTTPException(status_code=response["code"], detail=response["msg"])
 
+
+@app.delete("/packages/{package_id}")
+def get_package(package_id):
+    response = functions.del_package(package_id)
+    if response["code"] == 200:
+        return response["msg"]
+    raise HTTPException(status_code=response["code"], detail=response["msg"])
+
+
+@app.get("/packages")
+def get_packages(destination=None,arrival_date=None,status=None):
+    return functions.get_packages(destination, arrival_date, status)["packages"]
