@@ -19,3 +19,10 @@ def register(name : str, destination : str, weight : float, arrival_date: date):
     return functions.register_package(name, destination, weight, arrival_date)
 
 
+@app.get("/packages/{package_id}")
+def get_package(package_id):
+    response = functions.get_package(package_id)
+    if response["code"] == 200:
+        return response["package"]
+    raise HTTPException(status_code=response["code"] , detail=response["msg"])
+
