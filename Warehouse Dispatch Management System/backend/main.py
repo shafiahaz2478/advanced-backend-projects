@@ -19,24 +19,24 @@ def register(name : str, destination : str, weight : float, arrival_date: date):
     return functions.register_package(name, destination, weight, arrival_date)["package"]
 
 
-@app.get("/packages/{package_id}")
-def get_package(package_id):
-    response = functions.get_package(package_id)
+@app.get("/packages/{packageId}")
+def get_package(packageId):
+    response = functions.get_package(packageId)
     if response["code"] == 200:
         return response["package"]
     raise HTTPException(status_code=response["code"] , detail=response["msg"])
 
-@app.patch("/packages/{package_id}")
-def update_package(package_id , name=None,destination=None,weight=None,arrival_date=None,status=None):
-    response = functions.update_package(package_id,name, destination, weight, arrival_date, status)
+@app.patch("/packages/{packageId}")
+def update_package(packageId , name=None,destination=None,weight=None,arrival_date=None,status=None):
+    response = functions.update_package(packageId,name, destination, weight, arrival_date, status)
     if response["code"] == 200:
         return response["package"]
     raise HTTPException(status_code=response["code"], detail=response["msg"])
 
 
-@app.delete("/packages/{package_id}")
-def get_package(package_id):
-    response = functions.del_package(package_id)
+@app.delete("/packages/{packageId}")
+def get_package(packageId):
+    response = functions.del_package(packageId)
     if response["code"] == 200:
         return response["msg"]
     raise HTTPException(status_code=response["code"], detail=response["msg"])
@@ -56,3 +56,7 @@ def add_dispatch(packageId, destination,vehicle,status="transporting"):
     if response["code"] == 200:
         return response["dispatch"]
     raise HTTPException(status_code=response["code"], detail=response["msg"])
+
+@app.get("/summary")
+def summary():
+    return functions.summary()["response"]

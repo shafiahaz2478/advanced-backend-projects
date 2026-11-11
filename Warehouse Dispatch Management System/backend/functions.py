@@ -1,3 +1,4 @@
+
 from sqlalchemy import Integer, String, Float, Column, create_engine, Date, ForeignKey, func
 from sqlalchemy.orm import Session, declarative_base
 from datetime import datetime, date, timedelta
@@ -154,5 +155,29 @@ def add_dispatch(package_id, destination,vehicle,status):
     response = dispatch_to_dict(dispatch)
     session.close()
     return {"code":200 , "dispatch":response}
+
+
+def summary():
+    session = Session(engine)
+    package_received = session.query(Package).count()
+    package_pending = session.query(Package).filter(Package.status == "Dispatching").count()
+    package_dispatched = session.query(Package).filter(Package.status == "dispatched").count()
+    packages = session.query(Package).all()
+    package_dest = {}
+
+    for package in packages:
+        package_dest[package.destination] = package_dest.get(package.destination , 0) + 1
+
+
+
+    response = {
+        "package_received":package_received,
+        "package_pending":package_pending,
+        "package_dispatched":package_dispatched,
+        "package_dest":package_dest
+    }
+    session.close()
+    return {"code":200 , "response":response}
+
 
 
