@@ -1,12 +1,21 @@
 
 from sqlalchemy import Integer, String, Float, Column, create_engine, Date, ForeignKey, func
 from sqlalchemy.orm import Session, declarative_base
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, timedelta, timezone
+import jwt
 
 
 DB_PATH = "./warehouse.db"
 engine = create_engine(f"sqlite:///{DB_PATH}")
 Base = declarative_base()
+
+USERNAME = "Shafi"
+PASSWORD = "12345"
+
+ACCESS_TOKEN_EXPIRY = 1
+REFRESH_TOKEN_EXPIRY = 7 * 24 * 60
+SECRET_KEY = "thebigkeythatissecretthatnooneshouldseebutitspublicbecauseitsgonnabeingithub"
+ALGORITHM = "HS256"
 
 class Package(Base):
     __tablename__ = "package"
@@ -16,12 +25,12 @@ class Package(Base):
     weight = Column(Float)
     arrival_date = Column(Date)
     status = Column(String)
+    batch_id = Column(Integer, ForeignKey("dispatch.id") , nullable=True, default=None)
 
 
 class Dispatch(Base):
     __tablename__ = "dispatch"
     id = Column(Integer, primary_key=True)
-    package_id = Column(Integer, ForeignKey("package.id"))
     destination = Column(String)
     vehicle = Column(String)
     status = Column(String)
@@ -54,7 +63,8 @@ def package_to_dict(package:Package):
         "destination": package.destination,
         "weight": package.weight,
         "arrival_date":package.arrival_date,
-        "status": package.status
+        "status": package.status,
+        "batch_id":package.batch_id
 
     }
 def dispatch_to_dict(dispatch:Dispatch):
@@ -67,7 +77,7 @@ def dispatch_to_dict(dispatch:Dispatch):
 
     }
 
-def update_package(id, name=None,destination=None,weight=None,arrival_date=None,status=None):
+def update_package(id, name=None,destination=None,weight=None,arrival_date=None,status=None, batch_id = None):
     session = Session(engine)
     package = session.get(Package, id)
     if not package:
@@ -78,6 +88,7 @@ def update_package(id, name=None,destination=None,weight=None,arrival_date=None,
     package.weight = weight if weight else package.weight
     package.arrival_date = arrival_date if arrival_date else package.arrival_date
     package.status = status if status else package.status
+    package.batch_id = batch_id if batch_id else package.batch_id
 
     session.commit()
     response = package_to_dict(package)
@@ -144,12 +155,9 @@ def get_dispatch(destination=None,vehicle=None,status=None):
 
 
 
-def add_dispatch(package_id, destination,vehicle,status):
+def add_dispatch(destination,vehicle,status):
     session = Session(engine)
-    package = session.get(Package, package_id)
-    if not package:
-        return {"code": 404, "msg": "Package Not Found"}
-    dispatch = Dispatch(package_id=package_id , destination=destination, vehicle=vehicle, status=status)
+    dispatch = Dispatch( destination=destination, vehicle=vehicle, status=status)
     session.add(dispatch)
     session.commit()
     response = dispatch_to_dict(dispatch)
@@ -178,6 +186,36 @@ def summary():
     }
     session.close()
     return {"code":200 , "response":response}
+
+
+def verify_login(username , password):
+    if username == USERNAME and password == PASSWORD:
+        access_token = create_token(username,"access")
+        refresh_token = create_token(username,"refresh")
+        return {"access_token":access_token , "refresh_token": refresh_token}
+
+    return None
+
+def create_token(username, token_type):
+    payload = {
+        "username":username,
+        "token_type":token_type,
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRY if token_type == "access" else REFRESH_TOKEN_EXPIRY)
+    }
+
+    return jwt.encode(payload=payload , key=SECRET_KEY , algorithm=ALGORITHM)
+
+def verify_token(token, token_type):
+    try:
+        payload = jwt.decode(jwt=token,key=SECRET_KEY,algorithms=[ALGORITHM])
+    except:
+        return False
+
+    if payload["token_type"] == token_type:
+        return payload["username"]
+    return False
+
+
 
 
 
